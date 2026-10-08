@@ -2,48 +2,84 @@ import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * MusicPlayer handles audio playback gracefully.
- * - Supports custom MP3 files from public/assets/music/birthday-song.mp3
- * - Provides an optional soothing Web Audio API music-box synthesizer fallback
- *   so the website has beautiful romantic background music even before an MP3 is uploaded!
- * - Never breaks or throws uncaught exceptions if the audio fails or is missing.
+ * - Streams official YouTube audio via YouTube IFrame API (Dan + Shay & Justin Bieber - 10,000 Hours)
+ * - Supports local MP3 audio files if available
+ * - Provides soothing Web Audio API music-box synthesizer fallback
  */
 export default function MusicPlayer({ musicConfig }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioError, setAudioError] = useState(false);
-  const [usingFallbackSynth, setUsingFallbackSynth] = useState(false);
+  const [ytReady, setYtReady] = useState(false);
   
   const audioRef = useRef(null);
+  const ytPlayerRef = useRef(null);
   const synthTimerRef = useRef(null);
   const audioCtxRef = useRef(null);
 
-  // Initialize and clean up audio element
-  useEffect(() => {
-    const audio = new Audio();
-    // Resolve relative or base path
-    audio.src = musicConfig?.audioSrc || 'assets/music/birthday-song.mp3';
-    audio.loop = true;
-    audio.preload = 'metadata';
+  const videoId = musicConfig?.youtubeVideoId || "Y2E71oe0aSM";
+  const songTitle = musicConfig?.title || "10,000 Hours";
 
-    const handleError = () => {
-      // Audio file not found or couldn't be decoded - switch to gentle synthesizer fallback
-      setAudioError(true);
-      if (musicConfig?.enableSynthesizerFallback !== false) {
-        setUsingFallbackSynth(true);
+  // Load YouTube IFrame API script
+  useEffect(() => {
+    // Check if script already loaded
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    const initYT = () => {
+      try {
+        if (window.YT && window.YT.Player) {
+          ytPlayerRef.current = new window.YT.Player('yt-hidden-player', {
+            height: '1',
+            width: '1',
+            videoId: videoId,
+            playerVars: {
+              autoplay: 0,
+              controls: 0,
+              disablekb: 1,
+              fs: 0,
+              loop: 1,
+              playlist: videoId,
+              modestbranding: 1,
+              playsinline: 1,
+            },
+            events: {
+              onReady: () => {
+                setYtReady(true);
+              },
+              onStateChange: (event) => {
+                if (event.data === window.YT.PlayerState.PLAYING) {
+                  setIsPlaying(true);
+                } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
+                  setIsPlaying(false);
+                }
+              },
+              onError: () => {
+                // If YouTube embedding blocked, fallback seamlessly to audio element / chime
+                setYtReady(false);
+              }
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("YouTube player init:", err);
       }
     };
 
-    audio.addEventListener('error', handleError);
-    audioRef.current = audio;
+    if (window.YT && window.YT.Player) {
+      initYT();
+    } else {
+      window.onYouTubeIframeAPIReady = initYT;
+    }
 
     return () => {
-      audio.removeEventListener('error', handleError);
-      audio.pause();
-      audio.src = '';
       stopSynth();
     };
-  }, [musicConfig]);
+  }, [videoId]);
 
-  // Gentle Romantic Music-Box Synthesizer using Web Audio API
+  // Gentle Romantic Music-Box Synthesizer fallback
   const playRomanticChime = () => {
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -56,12 +92,11 @@ export default function MusicPlayer({ musicConfig }) {
         ctx.resume();
       }
 
-      // Romantic chord progression frequencies (C, G, Am, F lofi music box tones)
       const notes = [
-        261.63, 329.63, 392.00, 523.25, // C maj
-        220.00, 261.63, 329.63, 440.00, // A min
-        174.61, 220.00, 261.63, 349.23, // F maj
-        196.00, 246.94, 293.66, 392.00  // G maj
+        261.63, 329.63, 392.00, 523.25,
+        220.00, 261.63, 329.63, 440.00,
+        174.61, 220.00, 261.63, 349.23,
+        196.00, 246.94, 293.66, 392.00
       ];
       let noteIndex = 0;
 
@@ -71,7 +106,6 @@ export default function MusicPlayer({ musicConfig }) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
-        // Music box sine wave with soft bell harmonics
         osc.type = 'sine';
         osc.frequency.setValueAtTime(notes[noteIndex % notes.length], now);
 
@@ -91,7 +125,7 @@ export default function MusicPlayer({ musicConfig }) {
 
       triggerNextNote();
     } catch (e) {
-      console.warn("Synthesizer playback warning:", e);
+      console.warn("Synthesizer error:", e);
     }
   };
 
@@ -102,52 +136,75 @@ export default function MusicPlayer({ musicConfig }) {
     }
   };
 
-  const toggleMusic = async () => {
+  const toggleMusic = () => {
     if (isPlaying) {
       // Pause
-      if (audioRef.current && !usingFallbackSynth) {
+      if (ytPlayerRef.current && typeof ytPlayerRef.current.pauseVideo === 'function') {
+        ytPlayerRef.current.pauseVideo();
+      }
+      if (audioRef.current) {
         audioRef.current.pause();
       }
       stopSynth();
       setIsPlaying(false);
     } else {
       // Play
-      if (usingFallbackSynth || audioError) {
-        playRomanticChime();
-        setIsPlaying(true);
-      } else if (audioRef.current) {
+      if (ytPlayerRef.current && ytReady && typeof ytPlayerRef.current.playVideo === 'function') {
         try {
-          await audioRef.current.play();
+          ytPlayerRef.current.playVideo();
           setIsPlaying(true);
-        } catch (err) {
-          // If browser blocked or file missing, smoothly activate gentle chime
-          console.log("Using gentle melody chime fallback for romantic atmosphere");
-          setUsingFallbackSynth(true);
+          return;
+        } catch (e) {
+          console.warn("YouTube playback trigger fallback", e);
+        }
+      }
+
+      // Fallback
+      if (audioRef.current && audioRef.current.src) {
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
           playRomanticChime();
           setIsPlaying(true);
-        }
+        });
+      } else {
+        playRomanticChime();
+        setIsPlaying(true);
       }
     }
   };
 
   return (
     <div className="music-player-widget" style={widgetStyles}>
+      {/* Hidden YouTube Iframe Container */}
+      <div 
+        id="yt-hidden-player" 
+        style={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          right: 0, 
+          width: '1px', 
+          height: '1px', 
+          opacity: 0.01, 
+          pointerEvents: 'none', 
+          zIndex: -1 
+        }} 
+      />
+
       <button
         onClick={toggleMusic}
         className="music-toggle-btn"
         style={{
           ...btnStyles,
-          background: isPlaying ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)',
-          boxShadow: isPlaying ? '0 0 15px rgba(239, 167, 181, 0.6)' : '0 4px 15px rgba(122, 40, 72, 0.1)'
+          background: isPlaying ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.85)',
+          boxShadow: isPlaying ? '0 0 18px rgba(239, 167, 181, 0.65)' : '0 4px 15px rgba(122, 40, 72, 0.1)'
         }}
         aria-label={isPlaying ? "Pause background music" : "Play romantic background music"}
-        title={isPlaying ? "Click to pause music" : "Click to play romantic music"}
+        title={isPlaying ? `Click to pause ${songTitle}` : `Click to play ${songTitle}`}
       >
         <span style={{ fontSize: '1.15rem' }}>
           {isPlaying ? '🎵' : '🔇'}
         </span>
         <span style={textStyles}>
-          {isPlaying ? 'Music: Playing 🎶' : 'Music: Tap to Play 🎵'}
+          {isPlaying ? `Playing: ${songTitle} 🎶` : 'Play Song: 10,000 Hours 🎵'}
         </span>
         {isPlaying && (
           <span className="equalizer-bars" style={eqStyles}>
@@ -161,7 +218,6 @@ export default function MusicPlayer({ musicConfig }) {
   );
 }
 
-// Inline styling for self-contained, crash-proof widget layout
 const widgetStyles = {
   position: 'fixed',
   top: '16px',

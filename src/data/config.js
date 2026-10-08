@@ -37,10 +37,10 @@ export const config = {
   music: {
     // Relative path to local audio file in public/assets/music/
     audioSrc: "assets/music/birthday-song.mp3",
+    youtubeVideoId: "Y2E71oe0aSM",
     // Displayed song title in the floating music player badge
-    title: "Our Favorite Romantic Melody",
-    artist: "With Love",
-    // Autoplay policy: starts paused until first click, or plays gentle lofi chime synthesizer if audio file isn't present
+    title: "10,000 Hours",
+    artist: "Dan + Shay & Justin Bieber",
     enableSynthesizerFallback: true,
   },
 
@@ -77,8 +77,6 @@ export const config = {
   },
 
   // ── 7. STAGE 4: MEMORY GALLERY (POLAROID SCRAPBOOK) ───────────────────
-  // Place your photos in public/assets/images/ (e.g. photo1.jpg, photo2.jpg)
-  // If an image doesn't exist yet, a gorgeous illustrated romantic placeholder is rendered automatically!
   memories: [
     {
       id: 1,
@@ -99,34 +97,34 @@ export const config = {
     {
       id: 3,
       image: "assets/images/photo3.jpg",
-      caption: "A moment I wish I could relive ✨",
-      date: "Magic moments",
+      caption: "Birthday princess since day one 👑🎂",
+      date: "Little Prachi with her tiara",
       rotation: -2,
-      tag: "Always Cherished"
+      tag: "Little Princess"
     },
     {
       id: 4,
       image: "assets/images/photo4.jpg",
-      caption: "My favorite person, always. 🫶",
-      date: "Every single day",
+      caption: "Grace, beauty, and absolute elegance 🖤✨",
+      date: "Breathtaking in traditional",
       rotation: 3,
-      tag: "My Home"
+      tag: "Royal Elegance"
     },
     {
       id: 5,
       image: "assets/images/photo5.jpg",
-      caption: "Us being our silly little selves 😂",
-      date: "Nonstop laughter",
+      caption: "Peaceful moments with the ocean breeze 🌊🕊️",
+      date: "By the waves",
       rotation: -1.5,
-      tag: "Best Partner in Crime"
+      tag: "Serene & Sweet"
     },
     {
       id: 6,
       image: "assets/images/photo6.jpg",
-      caption: "A memory I will always keep close 💗",
-      date: "Forever in my heart",
+      caption: "In love with this view, but more with you 🏔️❄️",
+      date: "Snowy adventures",
       rotation: 2,
-      tag: "Endless Love"
+      tag: "My Mountain Girl"
     }
   ],
   galleryButtonText: "Next Surprise →",

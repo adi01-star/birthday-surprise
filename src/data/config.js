@@ -83,18 +83,18 @@ export const config = {
     {
       id: 1,
       image: "assets/images/photo1.jpg",
-      caption: "One of my favorite memories with you ❤️",
-      date: "A sweet day",
-      rotation: -3,
-      tag: "Unforgettable"
+      caption: "That smile I could never get tired of 🥹❤️",
+      date: "Looking stunning as always",
+      rotation: -2.5,
+      tag: "Gorgeous"
     },
     {
       id: 2,
       image: "assets/images/photo2.jpg",
-      caption: "That smile I could never get tired of 🥹",
-      date: "Golden hours",
+      caption: "You looking as magical as always ✨🌸",
+      date: "Pure grace & peace",
       rotation: 2.5,
-      tag: "Pure Joy"
+      tag: "My Angel"
     },
     {
       id: 3,

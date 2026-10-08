@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="envelopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8F0"/>
+      <stop offset="100%" stop-color="#F8DDE5"/>
+    </linearGradient>
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EFA7B5"/>
+      <stop offset="100%" stop-color="#7A2848"/>
+    </linearGradient>
+  </defs>
+  <!-- Envelope body -->
+  <rect x="6" y="16" width="52" height="36" rx="6" fill="url(#envelopeGrad)" stroke="#7A2848" stroke-width="2.5"/>
+  <!-- Envelope fold lines -->
+  <path d="M6 18 L32 38 L58 18" fill="none" stroke="#EFA7B5" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M6 52 L26 34" fill="none" stroke="#F8DDE5" stroke-width="1.5"/>
+  <path d="M58 52 L38 34" fill="none" stroke="#F8DDE5" stroke-width="1.5"/>
+  <!-- Heart seal -->
+  <path d="M32 32 C30 28, 24 28, 24 33 C24 38, 32 44, 32 44 C32 44, 40 38, 40 33 C40 28, 34 28, 32 32 Z" fill="url(#heartGrad)"/>
+</svg>

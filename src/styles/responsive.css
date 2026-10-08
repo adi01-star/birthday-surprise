@@ -1,0 +1,113 @@
+/* ==========================================================================
+   RESPONSIVE DESIGN, SAFE-AREAS & ACCESSIBILITY (REDUCED-MOTION)
+   ========================================================================== */
+
+/* Safe area insets for notched iPhones and mobile browsers */
+.app-container {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
+}
+
+/* Touch targets: all interactive elements have at least 44px clickable area */
+button, .envelope-container, .reason-card-container, .gallery-item {
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile Small (< 400px, e.g. 320px iPhone SE) */
+@media (max-width: 400px) {
+  .stage-wrapper {
+    padding: 1.5rem 0.75rem 4rem 0.75rem;
+  }
+
+  .envelope-container {
+    width: 290px;
+    height: 200px;
+    margin: 1.75rem auto;
+  }
+
+  .envelope-pocket-left {
+    border-top: 100px solid transparent;
+    border-bottom: 100px solid transparent;
+    border-left: 145px solid #f2cad7;
+  }
+  .envelope-pocket-right {
+    border-top: 100px solid transparent;
+    border-bottom: 100px solid transparent;
+    border-right: 145px solid #ecd0dc;
+  }
+  .envelope-pocket-bottom {
+    border-left: 145px solid transparent;
+    border-right: 145px solid transparent;
+    border-bottom: 110px solid #f8dde5;
+  }
+  .envelope-top-flap {
+    border-left: 145px solid transparent;
+    border-right: 145px solid transparent;
+    border-top: 115px solid #fce8ee;
+  }
+
+  .heading-display {
+    font-size: 1.85rem;
+  }
+  
+  .card-romantic, .card-paper {
+    padding: 1.35rem 1rem;
+  }
+
+  .btn-primary {
+    padding: 0.75rem 1.4rem;
+    font-size: 0.95rem;
+  }
+
+  .reasons-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Tablets and Desktops */
+@media (min-width: 768px) {
+  .stage-wrapper {
+    padding: 3rem 2rem 5rem 2rem;
+  }
+  
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .reasons-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .reasons-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ── ACCESSIBILITY: REDUCED MOTION ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .floating-heart-item {
+    display: none !important;
+  }
+
+  .envelope-container.is-open .envelope-top-flap {
+    transform: none;
+    display: none;
+  }
+
+  .envelope-container.is-open .envelope-letter {
+    transform: translateY(-80px);
+  }
+}
